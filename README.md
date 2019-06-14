@@ -10,7 +10,7 @@ This project uses:
 
 ## Quickstart
 
-- Install either node.js v10.x or nvm installed
+- Install either node.js v10.x or nvm
 - Install yarn
 - Run `yarn launch`
 - Open a web browser @ http://localhost:8080
