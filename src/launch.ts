@@ -1,7 +1,9 @@
 import { App } from "./App"
 
-let port = process.env["EXPRESS_PORT"] || "8080"
+let port = process.env["EXPRESS_PORT"] || "8080";
 
-App.run(
-    parseInt(port)
-)
+(async () => {
+    let app = new App(parseInt(port))
+
+    await app.run()
+})()

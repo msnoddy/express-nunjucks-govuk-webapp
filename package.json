@@ -5,14 +5,15 @@
   "license": "MIT",
   "scripts": {
     "audit": "improved-yarn-audit",
-    "build": "yarn audit && yarn install && yarn clean && tsc && yarn build-govuk-css",
-    "build-govuk-css": "node-sass node_modules/govuk-frontend/all-ie8.scss node_modules/govuk-frontend/all-ie8.css && node-sass node_modules/govuk-frontend/all.scss node_modules/govuk-frontend/all.css",
-    "clean": "rm -rf dist && rm -f node_modules/govuk-frontend/*.css",
+    "build": "yarn install && yarn audit && yarn clean && tsc && yarn deploy-govuk-frontend",
+    "deploy-govuk-frontend": "cp -r node_modules/govuk-frontend dist/govuk-frontend && yarn build-govuk-css && yarn clean-govuk-dist",
+    "build-govuk-css": "node-sass dist/govuk-frontend/all-ie8.scss dist/govuk-frontend/all-ie8.css && node-sass dist/govuk-frontend/all.scss dist/govuk-frontend/all.css",
+    "clean": "rm -rf dist",
+    "clean-govuk-dist": "find dist/govuk-frontend -name '*.scss' -type f -delete && find dist/govuk-frontend -type d -depth -empty -exec rmdir '{}' \\;",
     "launch": "yarn build && node dist/launch.js"
   },
   "dependencies": {
     "express": "^4.17.1",
-    "govuk-frontend": "^2.13.0",
     "html5shiv": "^3.7.3",
     "nunjucks": "^3.2.0"
   },
@@ -20,6 +21,7 @@
     "@types/express": "^4.17.0",
     "@types/node": "^12.0.8",
     "@types/nunjucks": "^3.1.1",
+    "govuk-frontend": "^2.13.0",
     "improved-yarn-audit": "^1.0.1",
     "node-sass": "^4.12.0",
     "typescript": "^3.5.2"
