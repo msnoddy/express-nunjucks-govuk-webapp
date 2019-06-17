@@ -83,13 +83,13 @@ export class App {
      */
     private async handleRoute(route: DynamicRoute, req: Request, res: Response) {
         try {
-            let model = {}
+            let model: Object = {}
 
             if (route.hasHandler) {
                 // build and call handler if present
                 let handler: IRoute = route.handlerBuilder()
 
-                model = await handler.handleRequest(req, res)
+                model = (await handler.handleRequest(req, res)) || {}
             }
 
             if (route.hasTemplate) {
