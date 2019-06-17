@@ -5,9 +5,14 @@ import { configure as configureNunjucks } from "nunjucks"
 
 import { IRoute } from "./interfaces/IRoute"
 import { AppConfig } from "./model/AppConfig"
-import { RouteInfo } from "./model/RouteInfo"
-import { HttpMethod } from './model/Routes';
+import { HttpMethod } from "./model/Routes"
+import { DynamicRoute } from "./utils/DynamicRoute"
 
+/**
+ * Configurable wrapper around express and nunjucks. Providing
+ * an instance of `AppConfig` will instruct this class to wire
+ * up routes to static resources, code and templates.
+ */
 export class App {
     private static readonly ROOT_PATH = joinPath(__dirname, "/../")
 
@@ -31,7 +36,7 @@ export class App {
 
         console.log(`Configured nunjuck paths: ${JSON.stringify(this.config.nunjuckTemplatePaths)}`)
 
-        this.configureRoutes()
+        await this.configureRoutes()
         this.configureStaticRoutes()
 
         await this.startExpressApp()
@@ -49,69 +54,55 @@ export class App {
             for (let method in routes[route]) {
                 let httpMethod = method as HttpMethod
                 let routeInfo = routes[route][method]
-                let routeHandlerBuilder = await this.generateRouteHandlerBuilder(route, routeInfo)
+                let dynamicRoute = new DynamicRoute(route, httpMethod, routeInfo)
+
+                if (!dynamicRoute.hasHandler && !dynamicRoute.hasTemplate) {
+                    throw new Error(`Route: '[${method}] ${route}' has no template or handler class specified`)
+                }
+
+                await dynamicRoute.generateRouteHandlerBuilder()
 
                 let expressRequestHandler: RequestHandler = async (req, res) => 
-                    await this.handleRoute(
-                        route, 
-                        method,
-                        routeInfo, 
-                        routeHandlerBuilder,
-                        req,
-                        res
-                    )
+                    await this.handleRoute(dynamicRoute, req, res)
 
                 this.configureExpressRoute(route, httpMethod, expressRequestHandler)
 
-                console.log(`Configured route: [${method}] ${route} => ${routeInfo.class}`)
+                console.log(
+                    `Configured route: [${method}] ${route} => ` +
+                    (dynamicRoute.hasHandler ? ` class: '${routeInfo.class}'` : "") +
+                    (dynamicRoute.hasTemplate ? ` template: '${routeInfo.template}'` : "")
+                )
             }
-        }
-    }
-
-    /**
-     * Dynamically import a route handler class and return
-     * a builder function that generates instances of type
-     * `IRoute`.
-     */
-    private async generateRouteHandlerBuilder(route: string, routeInfo: RouteInfo): Promise<() => IRoute> {
-        if (!routeInfo || !routeInfo.class || routeInfo.class.trim() === "") {
-            throw new Error(`Class for route '${route}' is null or blank`)
-        }
-
-        try {
-            let handlerClassImport = await import(`./routes/${routeInfo.class}`)
-            let handlerClass = handlerClassImport[routeInfo.class]
-
-            return () => new handlerClass()
-        } catch (ex) {
-            throw new Error(`Handler for route '${route}' was not found, expected path: ${__dirname}/routes/${routeInfo.class}.js`)
         }
     }
 
     /**
      * Handle the given route using the route class
-     * provided by `routeHandlerBuilder` and render
-     * a nunjucks template if configured.
+     * provided by `routeHandlerBuilder` (if present)
+     * and render a nunjucks template (if present).
      */
-    private async handleRoute(
-        route: string,
-        method: string,
-        routeInfo: RouteInfo,
-        routeHandlerBuilder: () => IRoute,
-        req: Request,
-        res: Response
-    ) {
-        let routeHasTemplate = routeInfo.template && routeInfo.template.trim() !== ""
-
+    private async handleRoute(route: DynamicRoute, req: Request, res: Response) {
         try {
-            let handler: IRoute = routeHandlerBuilder()
-            let model = await handler.handleRequest(req, res)
+            let model = {}
 
-            if (routeHasTemplate) {
-                await this.renderTemplate(routeInfo.template, model, res)
+            if (route.hasHandler) {
+                // build and call handler if present
+                let handler: IRoute = route.handlerBuilder()
+
+                model = await handler.handleRequest(req, res)
+            }
+
+            if (route.hasTemplate) {
+                // populate template if present
+                await this.renderTemplate(route.routeInfo.template, model, res)
             }
         } catch (ex) {
-            console.error(`Error handling route '[${method}] ${route}' using class '${routeInfo.class}'${routeHasTemplate ? ` and template ${routeInfo.template}` : ""}`)
+            console.error(
+                `Error handling route '[${route.method}] ${route}'` +
+                (route.hasHandler ? `, using class '${route.routeInfo.class}'` : "") +
+                (route.hasTemplate ? `, using template ${route.routeInfo.template}` : "")
+            )
+
             console.error(ex)
 
             // TODO: error page?
