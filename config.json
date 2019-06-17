@@ -1,0 +1,20 @@
+{
+    "nunjuckTemplatePaths": [
+        "dist/govuk-frontend/",
+        "dist/govuk-frontend/components/",
+        "views"
+    ],
+    "routes": {
+        "/": {
+            "GET": {
+                "class": "IndexRoute",
+                "template": "index"
+            }
+        }
+    },
+    "staticRoutes": {
+        "assets": "dist/govuk-frontend/assets",
+        "govuk-frontend": "dist/govuk-frontend",
+        "html5shiv": "node_modules/html5shiv/dist"
+    }
+}
