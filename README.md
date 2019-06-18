@@ -56,7 +56,7 @@ It provides a very simple wrapper which allows using the MVC pattern to add rout
     ```
 
 - `nunjuckTemplatePaths` - a list of paths that contain nunjuck template files
-- `routes` - a map of URL path route & HTTP method to template/handler class 
+- `routes` - a map of URL path route & HTTP method to template/handler class; wires up MVC components, with a route handler acting as a controller
 - `staticRoutes` - a list of paths that contain static assets (javascript, css etc.)
 
 A default `config.json` is provided in this repository.
