@@ -246,6 +246,7 @@ It is possible to add an route endpoint that does not have an associated templat
     - dist
     - node_modules
     - views
+    - config.json
     - runApp.sh
 - To start the app, use the `runApp.sh` script
 
