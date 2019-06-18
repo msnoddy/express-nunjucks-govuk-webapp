@@ -6,6 +6,11 @@ import { HttpMethod } from "../model/Routes"
 
 export type RouteHandlerBuilder = () => IRoute
 
+/**
+ * Wrapper around a route info object that provides
+ * calculated metadata and can produce a builder that
+ * constructs instances of the target handler class.
+ */
 export class DynamicRoute {
     private static readonly ROUTES_PATH = joinPath(__dirname, "/../../dist/routes")
 

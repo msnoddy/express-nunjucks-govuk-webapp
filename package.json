@@ -1,8 +1,15 @@
 {
   "name": "express-nunjucks-govuk-webapp",
   "version": "0.0.1",
-  "main": "dist/launch.js",
+  "main": "dist/main.js",
   "license": "MIT",
+  "files": [
+    "dist",
+    "views",
+    "config.json",
+    "runApp.sh",
+    "README.md"
+  ],
   "scripts": {
     "audit": "improved-yarn-audit",
     "build": "yarn install && yarn audit && yarn clean && tsc && yarn deploy-govuk-frontend",
@@ -10,7 +17,7 @@
     "build-govuk-css": "node-sass dist/govuk-frontend/all-ie8.scss dist/govuk-frontend/all-ie8.css && node-sass dist/govuk-frontend/all.scss dist/govuk-frontend/all.css",
     "clean": "rm -rf dist",
     "clean-govuk-dist": "find dist/govuk-frontend -name '*.scss' -type f -delete && find dist/govuk-frontend -type d -depth -empty -exec rmdir '{}' \\;",
-    "launch": "yarn build && node dist/launch.js"
+    "launch": "yarn build && node dist/main.js"
   },
   "dependencies": {
     "express": "^4.17.1",
