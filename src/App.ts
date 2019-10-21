@@ -2,6 +2,7 @@ import { join as joinPath} from "path"
 
 import express, { static as staticAssets, Express, Request, Response, RequestHandler } from "express"
 import { configure as configureNunjucks } from "nunjucks"
+import { Logger } from "winston"
 
 import { IRoute } from "./interfaces/IRoute"
 import { AppConfig } from "./model/AppConfig"
@@ -20,7 +21,8 @@ export class App {
 
     public constructor(
         private readonly config: AppConfig,
-        private readonly port: number
+        private readonly port: number,
+        private readonly logger: Logger
     ) {
         this.expressApp = express()
     }
@@ -34,7 +36,7 @@ export class App {
             }
         )
 
-        console.log(`Configured nunjuck paths: ${JSON.stringify(this.config.nunjuckTemplatePaths)}`)
+        this.logger.debug(`Configured nunjuck paths: ${JSON.stringify(this.config.nunjuckTemplatePaths)}`)
 
         await this.configureRoutes()
         this.configureStaticRoutes()
@@ -54,7 +56,7 @@ export class App {
             for (let method in routes[route]) {
                 let httpMethod = method as HttpMethod
                 let routeInfo = routes[route][method]
-                let dynamicRoute = new DynamicRoute(route, httpMethod, routeInfo)
+                let dynamicRoute = new DynamicRoute(route, httpMethod, routeInfo, this.logger)
 
                 if (!dynamicRoute.hasHandler && !dynamicRoute.hasTemplate) {
                     throw new Error(`Route: '[${method}] ${route}' has no template or handler class specified`)
@@ -67,7 +69,7 @@ export class App {
 
                 this.configureExpressRoute(route, httpMethod, expressRequestHandler)
 
-                console.log(
+                this.logger.info(
                     `Configured route: [${method}] ${route} => ` +
                     (dynamicRoute.hasHandler ? ` class: '${routeInfo.class}'` : "") +
                     (dynamicRoute.hasTemplate ? ` template: '${routeInfo.template}'` : "")
@@ -97,13 +99,13 @@ export class App {
                 await this.renderTemplate(route.routeInfo.template, model, res)
             }
         } catch (ex) {
-            console.error(
+            this.logger.error(
                 `Error handling route '[${route.method}] ${route}'` +
                 (route.hasHandler ? `, using class '${route.routeInfo.class}'` : "") +
                 (route.hasTemplate ? `, using template ${route.routeInfo.template}` : "")
             )
 
-            console.error(ex)
+            this.logger.error(ex)
 
             // TODO: error page?
             res.status(500)
@@ -159,7 +161,7 @@ export class App {
 
             this.expressApp.use(`/${route}`, staticAssets(absolutePath))
 
-            console.log(`Configured static route: /${route} => ${directoryPath}`)
+            this.logger.info(`Configured static route: /${route} => ${directoryPath}`)
         }
     }
 
@@ -172,6 +174,6 @@ export class App {
             }
         })
 
-        console.log(`Listening on http://localhost:${this.port}`)
+        this.logger.info(`Listening on http://localhost:${this.port}`)
     }
 }

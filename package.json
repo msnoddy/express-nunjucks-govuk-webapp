@@ -11,26 +11,27 @@
     "README.md"
   ],
   "scripts": {
-    "audit": "improved-yarn-audit",
-    "build": "yarn install && yarn audit && yarn clean && tsc && yarn deploy-govuk-frontend",
-    "deploy-govuk-frontend": "cp -r node_modules/govuk-frontend dist/govuk-frontend && yarn build-govuk-css && yarn clean-govuk-dist",
+    "improved-audit": "improved-yarn-audit --retry-on-network-failure",
+    "build": "yarn install && yarn improved-audit && yarn clean && tsc && yarn deploy-govuk-frontend",
+    "deploy-govuk-frontend": "cp -r node_modules/govuk-frontend/govuk dist/govuk-frontend && yarn build-govuk-css && yarn clean-govuk-dist",
     "build-govuk-css": "node-sass dist/govuk-frontend/all-ie8.scss dist/govuk-frontend/all-ie8.css && node-sass dist/govuk-frontend/all.scss dist/govuk-frontend/all.css",
-    "clean": "rm -rf dist",
     "clean-govuk-dist": "find dist/govuk-frontend -name '*.scss' -type f -delete && find dist/govuk-frontend -type d -depth -empty -exec rmdir '{}' \\;",
+    "clean": "rm -rf dist && rm -rf logs",
     "launch": "yarn build && node dist/main.js"
   },
   "dependencies": {
     "express": "^4.17.1",
     "html5shiv": "^3.7.3",
-    "nunjucks": "^3.2.0"
+    "nunjucks": "^3.2.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.0",
-    "@types/node": "^12.0.8",
-    "@types/nunjucks": "^3.1.1",
-    "govuk-frontend": "^2.13.0",
+    "@types/express": "^4.17.1",
+    "@types/node": "^12.11.2",
+    "@types/nunjucks": "^3.1.2",
+    "govuk-frontend": "^3.3.0",
     "improved-yarn-audit": "^1.0.1",
     "node-sass": "^4.12.0",
-    "typescript": "^3.5.2"
+    "typescript": "^3.6.4"
   }
 }

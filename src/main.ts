@@ -2,19 +2,16 @@ import { readFileSync } from "fs"
 
 import { App } from "./App"
 import { AppConfig } from "./model/AppConfig"
+import { errorAndExit } from "./utils/errorAndExit"
+import { loadLogger } from "./utils/loadLogger"
 
-function errorAndExit(message: string, ex: Error) {
-    console.error(message)
-    console.error(ex)
-
-    process.exit(1)
-}
+const ENV = process.env
 
 function loadPort() {
     let portAsString =  "8080"
 
     try {
-        portAsString = process.env["EXPRESS_PORT"] || portAsString
+        portAsString = ENV.EXPRESS_PORT || portAsString
 
         let port = parseInt(portAsString, 10)
 
@@ -32,7 +29,7 @@ function loadConfig() {
     let configPath = "config.json"
 
     try {
-        configPath = process.env["APP_CONFIG"] || configPath
+        configPath = ENV.APP_CONFIG || configPath
 
         let configJson = readFileSync(configPath).toString()
 
@@ -45,7 +42,8 @@ function loadConfig() {
 async function main() {
     let app = new App(
         loadConfig(),
-        loadPort()
+        loadPort(),
+        loadLogger()
     )
 
     await app.run()

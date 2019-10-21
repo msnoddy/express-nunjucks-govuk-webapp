@@ -1,5 +1,7 @@
 import { join as joinPath} from "path"
 
+import { Logger } from "winston"
+
 import { IRoute } from "../interfaces/IRoute"
 import { RouteInfo } from "../model/RouteInfo"
 import { HttpMethod } from "../model/Routes"
@@ -31,7 +33,8 @@ export class DynamicRoute {
     public constructor(
         public readonly route: string, 
         public readonly method: HttpMethod, 
-        public readonly routeInfo: RouteInfo
+        public readonly routeInfo: RouteInfo, 
+        public readonly logger: Logger
     ) {
     }
 
@@ -50,7 +53,7 @@ export class DynamicRoute {
             let handlerClassImport = await import(`${DynamicRoute.ROUTES_PATH}/${this.routeInfo.class}`)
             let handlerClass = handlerClassImport[this.routeInfo.class]
 
-            this._handlerBuilder = () => new handlerClass()
+            this._handlerBuilder = () => new handlerClass(this.logger)
         } catch (ex) {
             throw new Error(
                 `Handler for route '${this.route}' was not found, expected path: ` +

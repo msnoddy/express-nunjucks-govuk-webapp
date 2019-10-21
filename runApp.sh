@@ -10,7 +10,7 @@ function runApp() {
     fi
 
     cd "${scriptPath}"
-    node "dist/launch.js"
+    node "dist/main.js"
 }
 
 runApp
