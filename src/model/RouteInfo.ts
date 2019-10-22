@@ -1,4 +1,4 @@
 export class RouteInfo {
-    public class: string
-    public template: string 
+  public class: string
+  public template: string
 }

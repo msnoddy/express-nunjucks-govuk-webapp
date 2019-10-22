@@ -1,20 +1,36 @@
 {
-    "nunjuckTemplatePaths": [
-        "dist/govuk-frontend/",
-        "dist/govuk-frontend/components/",
-        "views"
-    ],
-    "routes": {
-        "/": {
-            "GET": {
-                "class": "IndexRoute",
-                "template": "index"
-            }
-        }
-    },
-    "staticRoutes": {
-        "assets": "dist/govuk-frontend/assets",
-        "govuk-frontend": "dist/govuk-frontend",
-        "html5shiv": "node_modules/html5shiv/dist"
+  "logging": {
+    "level": "debug",
+    "pattern": "${timestamp} ${level} ${message}",
+    "appenders": [
+      {
+        "type": "console",
+        "colorize": true
+      },
+      {
+        "type": "file",
+        "filename": "${LOG_PATH}/app.log",
+        "maxBackups": "20",
+        "maxSizeInMb": "25"
+      }
+    ]
+  },
+  "routes": {
+    "/": {
+      "GET": {
+        "class": "IndexRoute",
+        "template": "index"
+      }
     }
+  },
+  "staticRoutes": {
+    "govuk-frontend": "govuk-frontend",
+    "assets": "govuk-frontend/assets",
+    "html5shiv": "node_modules/html5shiv/dist"
+  },
+  "templatePaths": [
+    "govuk-frontend",
+    "govuk-frontend/components",
+    "views"
+  ]
 }

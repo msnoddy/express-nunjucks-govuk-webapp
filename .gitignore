@@ -1,4 +1,12 @@
 dist
+
 node_modules
+
+tests/js
+
+.nyc_output
+.test_results
+coverage
+
 *.log
 logs

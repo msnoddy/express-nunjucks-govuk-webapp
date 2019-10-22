@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "npm.packageManager": "yarn",
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "prettier.printWidth": 100,
+    "prettier.semi": false
+  },
+  "extensions": {
+    "recommendations": [
+      "dskwrk.vscode-generate-getter-setter",
+      "loiane.ts-extension-pack"
+    ]
+  }
+}

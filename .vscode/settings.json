@@ -1,8 +1,9 @@
 {
     "cSpell.words": [
-        "Appender",
-        "appenders",
-        "maxsize",
-        "nunjuck"
+      "Appender",
+      "appenders",
+      "maxsize",
+      "nunjuck",
+      "tailable"
     ]
 }

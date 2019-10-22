@@ -1,7 +1,7 @@
 export class LogAppender {
-    type: string
-    level: string
-    filename: string
-    maxBackups: number
-    maxSizeInMb: number
+  public type: string
+  public level: string
+  public filename: string
+  public maxBackups: number
+  public maxSizeInMb: number
 }

@@ -1,24 +1,25 @@
-FROM node:10.16-alpine
+FROM node:12-alpine as build
+
+COPY ./ /tmp/
+WORKDIR /tmp/
+
+RUN apk add bash findutils && \
+    rm -rf node_modules && \
+    yarn package
+
+FROM node:12-alpine 
 
 ARG APP_PATH=/opt/govuk-webapp
 
-RUN mkdir -p ${APP_PATH}
+ENV EXPRESS_PORT=80
+ENV LOG_PATH=/var/log
+ENV APP_CONFIG=/etc/config.json
 
-COPY src ${APP_PATH}/src
-COPY views ${APP_PATH}/views
-COPY .yarnclean runApp.sh tsconfig.json package.json yarn.lock ${APP_PATH}/
+COPY --from=build /tmp/dist/ ${APP_PATH}
+COPY --from=build /tmp/config.json ${APP_CONFIG}
 
 WORKDIR ${APP_PATH}
 
-RUN apk add findutils && \
-    yarn build && \
-    rm -rf node_modules && \
-    yarn install --production && \
-    rm -f .yarnclean package.json tsconfig.json yarn.lock && \
-    rm -rf src && \
-    apk del findutils
+RUN ls -lah
 
-ENV EXPRESS_PORT=80
-
-ENTRYPOINT [ "/bin/sh" ]
-CMD [ "runApp.sh" ]
+ENTRYPOINT [ "./bin/run" ]

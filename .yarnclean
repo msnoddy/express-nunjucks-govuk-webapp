@@ -44,5 +44,6 @@ wercker.yml
 # misc
 *.md
 
+!istanbul-reports/lib/html/assets
 !govuk-frontend/assets
 !govuk-frontend/assets/images
