@@ -20,7 +20,7 @@ function buildLogger(loggingConfig: LoggingConfig, logTransports: Transport[]) {
     format: format.combine(
       format.timestamp(),
       format.printf(({ level, message, timestamp }) =>
-        loggingConfig.pattern
+        (loggingConfig.pattern || "${timestamp} ${level} ${message}")
           .toLowerCase()
           .replace("${timestamp}", timestamp)
           .replace("${level}", level.toUpperCase().padEnd(7, " "))

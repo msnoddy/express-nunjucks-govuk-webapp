@@ -1,5 +1,6 @@
 import { join as joinPath } from "path"
 
+import { Container } from "inversify"
 import { Logger } from "winston"
 
 import { IRoute } from "./interfaces/IRoute"
@@ -31,6 +32,7 @@ export class DynamicRoute {
   }
 
   public constructor(
+    private readonly container: Container,
     public readonly route: string,
     public readonly method: HttpMethod,
     public readonly routeInfo: RouteInfo,
@@ -50,14 +52,11 @@ export class DynamicRoute {
 
     try {
       let handlerClassImport = await import(`${DynamicRoute.ROUTES_PATH}/${this.routeInfo.class}`)
-      let handlerClass = handlerClassImport[this.routeInfo.class]
+      let handlerConstructor = handlerClassImport[this.routeInfo.class].prototype.constructor
 
-      this._handlerBuilder = () => new handlerClass(this.logger)
+      this._handlerBuilder = () => this.container.get(handlerConstructor)
     } catch (ex) {
-      throw new Error(
-        `Handler for route '${this.route}' was not found, expected path: ` +
-          `${DynamicRoute.ROUTES_PATH}/${this.routeInfo.class}.js`
-      )
+      throw new Error(`Error loading route '${this.route}'\n${ex.stack}`)
     }
   }
 }

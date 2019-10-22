@@ -15,7 +15,7 @@
     "install-with-audit": "yarn install && yarn improved-audit",
     "clean-install": "rm -rf node_modules && yarn install-with-audit",
     "lint": "tslint 'src/**/*.ts'",
-    "build": "yarn clean && yarn lint && tsc && ./scripts/deploy-govuk-frontend.sh",
+    "build": "yarn clean && yarn lint && tsc && ./scripts/deploy-govuk-frontend.sh && cp -R views dist ",
     "build-all": "yarn install-with-audit && yarn build && yarn build-tests",
     "build-tests": "rm -rf ./tests/js && tsc -p ./tests",
     "test": "yarn build-all && scripts/run-tests.sh",
@@ -37,7 +37,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "html5shiv": "^3.7.3",
+    "inversify": "^5.0.1",
     "nunjucks": "^3.2.0",
+    "reflect-metadata": "^0.1.13",
     "winston": "^3.2.1"
   },
   "devDependencies": {

@@ -1,10 +1,15 @@
 import { Request, Response } from "express"
+import { inject, injectable } from "inversify"
 import { Logger } from "winston"
 
+import { AppTypes } from "../AppTypes"
 import { IRoute } from "../interfaces/IRoute"
 
+@injectable()
 export class IndexRoute implements IRoute {
-  public constructor(private readonly logger: Logger) {}
+  public constructor(
+    @inject(AppTypes.Logger) private readonly logger: Logger
+  ) {}
 
   public async handleRequest(req: Request, res: Response) {
     let requestUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`

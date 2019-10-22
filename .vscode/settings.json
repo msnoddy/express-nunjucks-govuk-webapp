@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
       "Appender",
+      "Customising",
       "appenders",
+      "autoescape",
+      "inversify",
       "maxsize",
       "nunjuck",
       "tailable"

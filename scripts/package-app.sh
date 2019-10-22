@@ -20,12 +20,7 @@ deployBin() {
   chmod +x dist/bin/run
 }
 
-deployViews() {
-  cp -R views dist
-}
-
 deploy() {
-  deployViews
   deployBin
   deployNodeModules
 

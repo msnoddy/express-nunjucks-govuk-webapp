@@ -10,6 +10,7 @@ import express, {
 import { configure as configureNunjucks } from "nunjucks"
 import { Logger } from "winston"
 
+import { AppContainer } from "./AppContainer"
 import { DynamicRoute } from "./DynamicRoute"
 import { IRoute } from "./interfaces/IRoute"
 import { AppConfig } from "./model/AppConfig"
@@ -24,6 +25,7 @@ export class App {
   private static readonly ROOT_PATH = __dirname
 
   private readonly expressApp: Express
+  private readonly container: AppContainer
 
   public constructor(
     private readonly config: AppConfig,
@@ -31,22 +33,15 @@ export class App {
     private readonly logger: Logger
   ) {
     this.expressApp = express()
+    this.container = new AppContainer()
   }
 
   public async run() {
-    configureNunjucks(this.config.templatePaths, {
-      autoescape: true,
-      express: this.expressApp
-    })
-
-    this.logger.debug(
-      `Configured nunjuck paths: ${JSON.stringify(
-        this.config.templatePaths
-      )}`
-    )
+    this.container.configure(this.logger)
 
     await this.configureRoutes()
     this.configureStaticRoutes()
+    this.configureTemplates()
 
     await this.startExpressApp()
   }
@@ -69,37 +64,42 @@ export class App {
           continue
         }
 
-        let httpMethod = method as HttpMethod
-        let routeInfo = routes[route][method]
-        let dynamicRoute = new DynamicRoute(
-          route,
-          httpMethod,
-          routeInfo,
-          this.logger
-        )
-
-        if (!dynamicRoute.hasHandler && !dynamicRoute.hasTemplate) {
-          throw new Error(
-            `Route: '[${method}] ${route}' has no template or handler class specified`
-          )
-        }
-
-        await dynamicRoute.generateRouteHandlerBuilder()
-
-        let expressRequestHandler: RequestHandler = async (req, res) =>
-          await this.handleRoute(dynamicRoute, req, res)
-
-        this.configureExpressRoute(route, httpMethod, expressRequestHandler)
-
-        this.logger.info(
-          `Configured route: [${method}] ${route} => ` +
-            (dynamicRoute.hasHandler ? ` class: '${routeInfo.class}'` : "") +
-            (dynamicRoute.hasTemplate
-              ? ` template: '${routeInfo.template}'`
-              : "")
-        )
+        this.configureRoute(route, method as HttpMethod)
       }
     }
+  }
+
+  private async configureRoute(route: string, method: HttpMethod) {
+    let routeInfo = this.config.routes[route][method]
+
+    let dynamicRoute = new DynamicRoute(
+      this.container,
+      route,
+      method,
+      routeInfo,
+      this.logger
+    )
+
+    if (!dynamicRoute.hasHandler && !dynamicRoute.hasTemplate) {
+      throw new Error(
+        `Route: '[${method}] ${route}' has no template or handler class specified`
+      )
+    }
+
+    await dynamicRoute.generateRouteHandlerBuilder()
+
+    let expressRequestHandler: RequestHandler = async (req, res) =>
+      await this.handleRoute(dynamicRoute, req, res)
+
+    this.configureExpressRoute(route, method, expressRequestHandler)
+
+    this.logger.info(
+      `Configured route: [${method}] ${route} => ` +
+        (dynamicRoute.hasHandler ? ` class: '${routeInfo.class}'` : "") +
+        (dynamicRoute.hasTemplate
+          ? ` template: '${routeInfo.template}'`
+          : "")
+    )
   }
 
   /**
@@ -124,17 +124,16 @@ export class App {
       }
     } catch (ex) {
       this.logger.error(
-        `Error handling route '[${route.method}] ${route}'` +
+        `Error handling route '[${route.method.toString()}] ${route}'` +
           (route.hasHandler ? `, using class '${route.routeInfo.class}'` : "") +
           (route.hasTemplate
-            ? `, using template ${route.routeInfo.template}`
-            : "")
+            ? `, using template '${route.routeInfo.template}'`
+            : "") +
+          `\n${ex.stack}`
       )
 
-      this.logger.error(ex)
-
       // TODO: error page?
-      res.status(500)
+      res.status(500).send()
     }
   }
 
@@ -152,8 +151,7 @@ export class App {
         }
 
         // replicate nunjucks default behaviour
-        res
-          .status(200)
+        res.status(200)
           .contentType("text/html")
           .send(html)
 
@@ -202,6 +200,23 @@ export class App {
         `Configured static route: /${route} => ${directoryPath}`
       )
     }
+  }
+
+  private configureTemplates() {
+    let absoluteTemplatePaths = this.config.templatePaths.map(p =>
+      joinPath(App.ROOT_PATH, `/${p}`)
+    )
+
+    configureNunjucks(absoluteTemplatePaths, {
+      autoescape: true,
+      express: this.expressApp
+    })
+
+    this.logger.debug(
+      `Configured nunjuck paths: ${JSON.stringify(
+        this.config.templatePaths
+      )}`
+    )
   }
 
   private async startExpressApp() {

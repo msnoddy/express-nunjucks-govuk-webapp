@@ -1,4 +1,6 @@
 #! /usr/bin/env node
+import "reflect-metadata"
+
 import { readFileSync } from "fs"
 
 import { App } from "../App"

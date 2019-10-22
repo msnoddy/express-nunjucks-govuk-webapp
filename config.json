@@ -4,8 +4,7 @@
     "pattern": "${timestamp} ${level} ${message}",
     "appenders": [
       {
-        "type": "console",
-        "colorize": true
+        "type": "console"
       },
       {
         "type": "file",
