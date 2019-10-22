@@ -124,7 +124,7 @@ export class App {
       }
     } catch (ex) {
       this.logger.error(
-        `Error handling route '[${route.method.toString()}] ${route}'` +
+        `Error handling route '[${route.method}] ${route.route}'` +
           (route.hasHandler ? `, using class '${route.routeInfo.class}'` : "") +
           (route.hasTemplate
             ? `, using template '${route.routeInfo.template}'`
@@ -139,7 +139,7 @@ export class App {
 
   /**
    * Render a nunjucks template with the given model, and
-   * write the output HTML to the express response includes
+   * write the output HTML to the express response; includes
    * async error handling.
    */
   private async renderTemplate(template: string, model: any, res: Response) {
@@ -191,13 +191,12 @@ export class App {
         continue
       }
 
-      let directoryPath = staticRoutes[route]
-      let absolutePath = joinPath(App.ROOT_PATH, `/${directoryPath}`)
+      let absolutePath = joinPath(App.ROOT_PATH, `/${staticRoutes[route]}`)
 
       this.expressApp.use(`/${route}`, staticAssets(absolutePath))
 
-      this.logger.info(
-        `Configured static route: /${route} => ${directoryPath}`
+      this.logger.debug(
+        `Configured static route: /${route} => ${absolutePath}`
       )
     }
   }
@@ -213,9 +212,7 @@ export class App {
     })
 
     this.logger.debug(
-      `Configured nunjuck paths: ${JSON.stringify(
-        this.config.templatePaths
-      )}`
+      `Configured nunjuck paths: ${JSON.stringify(absoluteTemplatePaths)}`
     )
   }
 

@@ -20,6 +20,4 @@ COPY --from=build /tmp/config.json ${APP_CONFIG}
 
 WORKDIR ${APP_PATH}
 
-RUN ls -lah
-
 ENTRYPOINT [ "./bin/run" ]

@@ -5,13 +5,23 @@ import { readFileSync } from "fs"
 
 import { App } from "../App"
 import { AppConfig } from "../model/AppConfig"
-import { errorAndExit } from "../utils/errorAndExit"
-import { loadLogger } from "../utils/loadLogger"
+import { LoggerFactory } from "../utils/LoggerFactory"
 
 const ENV = process.env
 
-function loadPort() {
-  let portAsString = "8080"
+const DEFAULT_CONFIG_PATH = "config.json"
+const DEFAULT_PORT = 8080
+
+// tslint:disable: no-console
+function errorAndExit(message: string, ex: Error) {
+  console.error(message)
+  console.error(ex)
+
+  process.exit(1)
+}
+
+function resolvePort() {
+  let portAsString = `${DEFAULT_PORT}`
 
   try {
     portAsString = ENV.EXPRESS_PORT || portAsString
@@ -31,8 +41,8 @@ function loadPort() {
   }
 }
 
-function loadConfig() {
-  let configPath = "config.json"
+function resolveConfig() {
+  let configPath = DEFAULT_CONFIG_PATH
 
   try {
     configPath = ENV.APP_CONFIG || configPath
@@ -46,11 +56,11 @@ function loadConfig() {
 }
 
 async function main() {
-  let config = loadConfig()
+  let config = resolveConfig()
   let app = new App(
     config,
-    loadPort(),
-    loadLogger(config)
+    resolvePort(),
+    LoggerFactory.loadLogger(config)
   )
 
   await app.run()

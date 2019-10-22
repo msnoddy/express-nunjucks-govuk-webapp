@@ -12,7 +12,8 @@ export type RouteHandlerBuilder = () => IRoute
 /**
  * Wrapper around a route info object that provides
  * calculated metadata and can produce a builder that
- * constructs instances of the target handler class.
+ * constructs instances of the target handler class with
+ * dependency injection
  */
 export class DynamicRoute {
   private static readonly ROUTES_PATH = joinPath(__dirname, "/routes")
@@ -51,9 +52,12 @@ export class DynamicRoute {
     }
 
     try {
-      let handlerClassImport = await import(`${DynamicRoute.ROUTES_PATH}/${this.routeInfo.class}`)
-      let handlerConstructor = handlerClassImport[this.routeInfo.class].prototype.constructor
+      // get the constructor for a handler class by importing it
+      let handlerClassName = this.routeInfo.class
+      let handlerClassImport = await import(`${DynamicRoute.ROUTES_PATH}/${handlerClassName}`)
+      let handlerConstructor = handlerClassImport[handlerClassName].prototype.constructor
 
+      // build an instance by passing the constructor to inversify for dependency injection
       this._handlerBuilder = () => this.container.get(handlerConstructor)
     } catch (ex) {
       throw new Error(`Error loading route '${this.route}'\n${ex.stack}`)

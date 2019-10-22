@@ -15,7 +15,7 @@
     "install-with-audit": "yarn install && yarn improved-audit",
     "clean-install": "rm -rf node_modules && yarn install-with-audit",
     "lint": "tslint 'src/**/*.ts'",
-    "build": "yarn clean && yarn lint && tsc && ./scripts/deploy-govuk-frontend.sh && cp -R views dist ",
+    "build": "yarn clean && yarn lint && tsc && ./scripts/deploy-govuk-frontend-and-views.sh",
     "build-all": "yarn install-with-audit && yarn build && yarn build-tests",
     "build-tests": "rm -rf ./tests/js && tsc -p ./tests",
     "test": "yarn build-all && scripts/run-tests.sh",
