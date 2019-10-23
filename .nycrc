@@ -1,0 +1,27 @@
+{
+  "check-coverage": true,
+  "per-file": true,
+  "lines": 70,
+  "statements": 70,
+  "functions": 70,
+  "branches": 70,
+  "extension": [
+    ".ts",
+    ".tsx"
+  ],
+  "exclude": [
+    "tests/**",
+    "dist/govuk-frontend",
+    "**/*.d.ts",
+    "**/node_modules/**"
+  ],
+  "reporter": [
+    "lcov",
+    "html"
+  ],
+  "report-dir": ".test_results/coverage",
+  "cache": false,
+  "TODO: add back in when tests have been written": {
+    "all": true
+  }
+}

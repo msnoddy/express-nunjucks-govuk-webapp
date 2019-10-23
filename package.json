@@ -10,7 +10,7 @@
     "scripts/runApp.sh"
   ],
   "scripts": {
-    "clean": "rm -rf dist && rm -rf logs",
+    "clean": "rm -rf dist logs .nyc_output .test_results",
     "improved-audit": "improved-yarn-audit --retry-on-network-failure",
     "install-with-audit": "yarn install && yarn improved-audit",
     "clean-install": "rm -rf node_modules && yarn install-with-audit",
@@ -22,17 +22,6 @@
     "package": "yarn test && ./scripts/package-app.sh",
     "launch": "yarn test && node dist/bin/run.js",
     "shell": "$SHELL"
-  },
-  "nyc": {
-    "check-coverage": true,
-    "per-file": true,
-    "lines": 70,
-    "statements": 70,
-    "functions": 70,
-    "branches": 70,
-    "exclude": [
-      "tests/**/*"
-    ]
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -53,6 +42,7 @@
     "junit-bark": "^1.1.2",
     "node-sass": "^4.12.0",
     "nyc": "^14.1.1",
+    "source-map-support": "^0.5.13",
     "tap-spec": "^5.0.0",
     "tslint": "^5.20.0",
     "typescript": "^3.6.4"

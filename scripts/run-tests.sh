@@ -47,13 +47,9 @@ determineExitCode() {
 }
 
 runTestsWithCoverage() {
-  nyc --reporter=lcov --reporter=html alsatian --tap "./tests/js/**/*Tests.js" 2>&1 | \
+  nyc alsatian --tap "./tests/js/**/*Tests.js" 2>&1 | \
     tee "${tapFile}" | \
     tap-spec
-
-  if [ -d coverage ]; then
-    mv coverage .test_results
-  fi
 
   determineExitCode "$(printf "%s" "${PIPESTATUS[@]}")"
 }

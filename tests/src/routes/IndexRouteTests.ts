@@ -20,7 +20,7 @@ export class IndexRouteTests {
     request.get("host").returns("localhost")
     request.protocol.returns("https")
     request.originalUrl.returns("/")
-    
+
     socket.remoteAddress.returns("?")
     socket.remotePort.returns(0)
 

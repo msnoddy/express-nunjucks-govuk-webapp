@@ -1,5 +1,6 @@
 #! /usr/bin/env node
-import "reflect-metadata"
+import "reflect-metadata"             // required for inversify to work
+import "source-map-support/register"  // provides ts file lines in stack traces
 
 import { readFileSync } from "fs"
 

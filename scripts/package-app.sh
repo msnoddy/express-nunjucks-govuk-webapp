@@ -4,7 +4,6 @@ set -ex
 cleanFiles() {
   rm -f dist/config.json
   find dist -name '*.d.ts' -type f -delete
-  find dist -name '*.js.map' -type f -delete
 }
 
 deployNodeModules() {
