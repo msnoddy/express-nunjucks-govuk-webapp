@@ -40,7 +40,7 @@
     "govuk-frontend": "^3.3.0",
     "improved-yarn-audit": "^1.0.1",
     "junit-bark": "^1.1.2",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.1",
     "nyc": "^14.1.1",
     "source-map-support": "^0.5.13",
     "tap-spec": "^5.0.0",
